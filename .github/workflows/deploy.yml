@@ -8,9 +8,9 @@ jobs:
       - name: Check Out
         uses: actions/checkout@v3
       - name: Build Image
-        run: docker build --tag bureaucrat:latest .
+        run: docker build --tag cities-game:latest .
       - name: Tag Image
-        run: docker image tag bureaucrat registry.horizons-server.org/cities-game
+        run: docker image tag cities-game registry.horizons-server.org/cities-game
       - name: Login to Registry
         run: echo ${{ secrets.REGISTRY_PASSWORD }} | docker login -u ${{ secrets.REGISTRY_USERNAME }} --password-stdin https://registry.horizons-server.org
       - name: Push to Registry
