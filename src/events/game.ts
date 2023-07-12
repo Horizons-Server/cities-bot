@@ -1,7 +1,6 @@
 import { ArgsOf, On, Client, Discord } from "discordx";
 import { env } from "../utils/env.js";
 import { isRealCity } from "../utils/cityChecker.js";
-import { ThreadChannel } from "discord.js";
 
 @Discord()
 class Game {
