@@ -1,6 +1,7 @@
 import { ArgsOf, On, Client, Discord } from "discordx";
 import { env } from "../utils/env.js";
 import { isRealCity } from "../utils/cityChecker.js";
+import { ActivityType } from "discord.js";
 
 @Discord()
 class Game {
@@ -11,6 +12,7 @@ class Game {
     guardPayload: any
   ) {
     if (message.channelId !== env.CHANNEL_ID) return;
+    if (message.author.bot) return;
 
     if (message.content === "START NEW GAME") {
       message.react("✅");
@@ -65,6 +67,10 @@ class Game {
         if (lastLetter.toLowerCase() === message.content[0].toLowerCase()) {
           // react a green checkmark
           message.react("✅");
+          client.user!.setActivity(
+            `for the letter ${message.content[message.content.length - 1]}`,
+            { type: ActivityType.Watching }
+          );
           return;
         } else {
           // react a red cross
