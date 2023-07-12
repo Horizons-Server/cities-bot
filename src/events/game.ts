@@ -19,6 +19,9 @@ class Game {
       return;
     }
 
+    // remove all accents and uppercase letters
+    // const messageContent = message.content.normalize("NFD").toLowerCase();
+
     if (!isRealCity(message.content)) {
       message.react("❌");
       message.reply("That's not a real city!");
@@ -60,6 +63,13 @@ class Game {
       const users = await reactions.users.fetch();
 
       if (users.has(client.user!.id)) {
+        if (msg.author.id === message.author.id) {
+          // react a red cross
+          message.react("❌");
+          message.reply("You can't go twice in a row!");
+          return;
+        }
+
         // get the last letter of the message
         const lastLetter = msg.content[msg.content.length - 1];
 
