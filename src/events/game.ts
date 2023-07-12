@@ -24,7 +24,7 @@ class Game {
 
     if (!isRealCity(message.content)) {
       message.react("❌");
-      message.reply("That's not a real city!");
+      message.reply({ content: "That's not a real city!", ephemeral: true });
       return;
     }
 
@@ -45,7 +45,7 @@ class Game {
         if (users.has(client.user!.id)) {
           // react a red cross
           message.react("❌");
-          message.reply("That city was already used!");
+          message.reply({ content: "That city was already used!", ephemeral: true });
           return;
         }
       }
@@ -66,7 +66,7 @@ class Game {
         if (msg.author.id === message.author.id) {
           // react a red cross
           message.react("❌");
-          message.reply("You can't go twice in a row!");
+          message.reply({ content: "You can't go twice in a row!", ephemeral: true });
           return;
         }
 
@@ -85,7 +85,7 @@ class Game {
         } else {
           // react a red cross
           message.react("❌");
-          message.reply("That city doesn't start with the right letter!");
+          message.reply({ content: "That city doesn't start with the right letter!", ephemeral: true });
           return;
         }
       }
