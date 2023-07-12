@@ -1,7 +1,7 @@
 import { ArgsOf, On, Client, Discord } from "discordx";
 import { env } from "../utils/env.js";
 import { isRealCity } from "../utils/cityChecker.js";
-import { ActivityType } from "discord.js";
+import { ActivityType, Message } from "discord.js";
 
 @Discord()
 class Game {
@@ -24,7 +24,8 @@ class Game {
 
     if (!isRealCity(message.content)) {
       message.react("❌");
-      message.reply({ content: "That's not a real city!", ephemeral: true });
+      message.reply("That's not a real city!");
+      deleteMessageAfter(message, 5);
       return;
     }
 
@@ -45,7 +46,8 @@ class Game {
         if (users.has(client.user!.id)) {
           // react a red cross
           message.react("❌");
-          message.reply({ content: "That city was already used!", ephemeral: true });
+          message.reply("That city was already used!");
+          deleteMessageAfter(message, 5);
           return;
         }
       }
@@ -66,7 +68,8 @@ class Game {
         if (msg.author.id === message.author.id) {
           // react a red cross
           message.react("❌");
-          message.reply({ content: "You can't go twice in a row!", ephemeral: true });
+          message.reply("You can't go twice in a row!");
+          deleteMessageAfter(message, 5);
           return;
         }
 
@@ -85,7 +88,8 @@ class Game {
         } else {
           // react a red cross
           message.react("❌");
-          message.reply({ content: "That city doesn't start with the right letter!", ephemeral: true });
+          message.reply("That city doesn't start with the right letter!");
+          deleteMessageAfter(message, 5);
           return;
         }
       }
@@ -96,3 +100,9 @@ class Game {
     message.reply("Obi goofed up.");
   }
 }
+
+const deleteMessageAfter = (message: Message<boolean>, seconds: number) => {
+  setTimeout(() => {
+    message.delete();
+  }, seconds * 1000);
+};
