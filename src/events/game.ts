@@ -24,8 +24,8 @@ class Game {
 
     if (!isRealCity(message.content)) {
       message.react("❌");
-      message.reply("That's not a real city!");
-      deleteMessageAfter(message, 5);
+      const response = await message.reply("That's not a real city!");
+      deleteMessageAfter(response, 5);
       return;
     }
 
@@ -46,8 +46,8 @@ class Game {
         if (users.has(client.user!.id)) {
           // react a red cross
           message.react("❌");
-          message.reply("That city was already used!");
-          deleteMessageAfter(message, 5);
+          const response = await message.reply("That city was already used!");
+          deleteMessageAfter(response, 5);
           return;
         }
       }
@@ -68,8 +68,8 @@ class Game {
         if (msg.author.id === message.author.id) {
           // react a red cross
           message.react("❌");
-          message.reply("You can't go twice in a row!");
-          deleteMessageAfter(message, 5);
+          const response = await message.reply("You can't go twice in a row!");
+          deleteMessageAfter(response, 5);
           return;
         }
 
@@ -88,8 +88,10 @@ class Game {
         } else {
           // react a red cross
           message.react("❌");
-          message.reply("That city doesn't start with the right letter!");
-          deleteMessageAfter(message, 5);
+          const response = await message.reply(
+            "That city doesn't start with the right letter!"
+          );
+          deleteMessageAfter(response, 5);
           return;
         }
       }
