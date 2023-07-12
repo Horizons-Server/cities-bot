@@ -19,7 +19,7 @@ class Game {
 
     if (!isRealCity(message.content)) {
       message.react("❌");
-      console.log("not real city");
+      message.reply("That's not a real city!");
       return;
     }
 
@@ -29,6 +29,7 @@ class Game {
 
     // check if the city was used before
     for (const [_id, msg] of channelMessages) {
+      if (msg.author.id === client.user!.id) continue;
       if (msg.content.toLowerCase() === message.content.toLowerCase()) {
         const reactions = await msg.reactions.resolve("✅")?.fetch();
 
@@ -39,6 +40,7 @@ class Game {
         if (users.has(client.user!.id)) {
           // react a red cross
           message.react("❌");
+          message.reply("That city was already used!");
           return;
         }
       }
@@ -46,6 +48,8 @@ class Game {
 
     for (const [_id, msg] of channelMessages) {
       // check if the message has been reacted to by the bot with a green checkmark
+
+      if (msg.author.id === client.user!.id) continue;
 
       const reactions = await msg.reactions.resolve("✅")?.fetch();
 
@@ -65,6 +69,7 @@ class Game {
         } else {
           // react a red cross
           message.react("❌");
+          message.reply("That city doesn't start with the right letter!");
           return;
         }
       }
@@ -72,5 +77,6 @@ class Game {
 
     // react a red cross
     message.react("❌");
+    message.reply("Obi goofed up.");
   }
 }
