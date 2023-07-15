@@ -1,7 +1,8 @@
 import { ArgsOf, On, Client, Discord } from "discordx";
 import { env } from "../utils/env.js";
 import { isRealCity } from "../utils/cityChecker.js";
-import { ActivityType, Message } from "discord.js";
+import { ActivityType, EmbedBuilder, Message } from "discord.js";
+import * as fs from "fs";
 
 @Discord()
 class Game {
@@ -16,6 +17,14 @@ class Game {
 
     if (message.content === "START NEW GAME") {
       message.react("✅");
+      setPointEmbed(client, "final");
+      message.channel.send({ embeds: [pointEmbed] });
+      global.points = [];
+      return;
+    }
+    if (message.content === "VIEW CURRENT POINTS") {
+      setPointEmbed(client, "current");
+      message.channel.send({ embeds: [pointEmbed] });
       return;
     }
 
@@ -80,6 +89,9 @@ class Game {
         if (lastLetter.toLowerCase() === message.content[0].toLowerCase()) {
           // react a green checkmark
           message.react("✅");
+          if (message.author.id in points) { points[parseInt(message.author.id)]++ }
+          else { points[parseInt(message.author.id)] = 1 };
+          fs.writeFileSync("./data/points.json", JSON.stringify(points))
           client.user!.setActivity(
             `for the letter ${message.content[message.content.length - 1]}`,
             { type: ActivityType.Watching }
@@ -102,7 +114,17 @@ class Game {
     message.reply("Obi goofed up.");
   }
 }
-
+const pointEmbed = new EmbedBuilder();
+const setPointEmbed = (client: Client, type: string) => {
+  if (type == "current") {
+    pointEmbed.setTitle("Current scores")
+  } else if (type == "final") {
+    pointEmbed.setTitle("Final scores")
+  };
+  for (var key in global.points) {
+    pointEmbed.addFields({ name: (client.users.fetch(key)).toString(), value: global.points[key]});
+  };
+}
 const deleteMessageAfter = (message: Message<boolean>, seconds: number) => {
   setTimeout(() => {
     message.delete();
