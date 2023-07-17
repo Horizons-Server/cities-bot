@@ -76,6 +76,7 @@ async function run() {
 }
 
 run();
-process.on("SIGTERM", () => {
+process.once("SIGTERM", () => {
   fs.writeFileSync("./data/points.json", JSON.stringify(global.points))
+  process.exit()
 });

@@ -1,3 +1,5 @@
+export interface global {};
+
 declare global {
-    var points: int[];
+    var points: Record<int, int>; 
 }

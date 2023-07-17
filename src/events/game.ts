@@ -122,7 +122,7 @@ const setPointEmbed = (client: Client, type: string) => {
     pointEmbed.setTitle("Final scores")
   };
   for (var key in global.points) {
-    pointEmbed.addFields({ name: (client.users.fetch(key)).toString(), value: global.points[key]});
+    pointEmbed.addFields({ name: (client.users.fetch(key)).toString(), value: global.points[key] });
   };
 }
 const deleteMessageAfter = (message: Message<boolean>, seconds: number) => {
