@@ -20,7 +20,6 @@ class Game {
       pointEmbed.setTitle("Final scores");
       pointEmbed.setFields([]);
       for (var key in global.points) {
-        console.log(global.points[key])
         pointEmbed.addFields({ name: (await client.users.fetch(key)).username.toString(), value: points[key].toString() });
       };
       message.channel.send({ embeds: [pointEmbed] });
@@ -103,11 +102,8 @@ class Game {
         if (lastLetter.toLowerCase() === message.content[0].toLowerCase()) {
           // react a green checkmark
           message.react("✅");
-          if (message.author.id in global.points) { global.points[message.author.id]++; console.log("Point Added"); }
-          else { global.points[message.author.id] = 1; console.log("Point Added") };
-          console.log(global.points);
-          console.log(typeof global.points)
-          console.log(JSON.stringify(global.points));
+          if (message.author.id in global.points) { global.points[message.author.id]++; }
+          else { global.points[message.author.id] = 1; };
           fs.writeFileSync("./src/data/points.json", JSON.stringify(global.points));
           client.user!.setActivity(
             `for the letter ${message.content[message.content.length - 1]}`,
