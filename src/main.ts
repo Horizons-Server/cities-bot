@@ -33,7 +33,8 @@ bot.once("ready", async () => {
 
   // Synchronize applications commands with Discord
   await bot.initApplicationCommands();
-  global.points = JSON.parse(fs.readFileSync("./data/points.json", 'utf8'))
+  console.log(process.cwd())
+  global.points = JSON.parse(fs.readFileSync("./src/data/points.json", 'utf8')) || {};
   // To clear all guild commands, uncomment this line,
   // This is useful when moving from guild commands to global commands
   // It must only be executed once
@@ -44,9 +45,10 @@ bot.once("ready", async () => {
 
   console.log("Bot started");
   async function autoSave() {
-    fs.writeFileSync("./data/points.json", JSON.stringify(global.points));
+    fs.writeFileSync("./src/data/points.json", JSON.stringify(global.points));
+    console.log("Autosave successful");
   }
-  setInterval(autoSave, 300000)
+  setInterval(autoSave, 4000)
 
 });
 
@@ -77,6 +79,6 @@ async function run() {
 
 run();
 process.once("SIGTERM", () => {
-  fs.writeFileSync("./data/points.json", JSON.stringify(global.points))
+  fs.writeFileSync("./src/data/points.json", JSON.stringify(global.points))
   process.exit()
 });

@@ -17,14 +17,25 @@ class Game {
 
     if (message.content === "START NEW GAME") {
       message.react("✅");
-      setPointEmbed(client, "final");
+      pointEmbed.setTitle("Final scores");
+      pointEmbed.setFields([]);
+      for (var key in global.points) {
+        console.log(global.points[key])
+        pointEmbed.addFields({ name: (await client.users.fetch(key)).username.toString(), value: points[key].toString() });
+      };
       message.channel.send({ embeds: [pointEmbed] });
-      global.points = [];
+      global.points = {}
+      fs.writeFileSync("./src/data/points.json", JSON.stringify(global.points));
       return;
     }
     if (message.content === "VIEW CURRENT POINTS") {
-      setPointEmbed(client, "current");
-      message.channel.send({ embeds: [pointEmbed] });
+      message.react("✅")
+      pointEmbed.setTitle("Current scores")
+      pointEmbed.setFields([]);
+      for (var key in global.points) {
+        pointEmbed.addFields({ name: (await client.users.fetch(key)).username.toString(), value: points[key].toString() });
+      };
+      message.reply({ embeds: [pointEmbed] });
       return;
     }
 
@@ -70,11 +81,14 @@ class Game {
       const reactions = await msg.reactions.resolve("✅")?.fetch();
 
       if (!reactions) continue;
-
+      if ((msg.content === "START NEW GAME") || (msg.content === "VIEW CURRENT POINTS")) {
+        continue;
+      }  
       const users = await reactions.users.fetch();
 
       if (users.has(client.user!.id)) {
         if (msg.author.id === message.author.id) {
+                      
           // react a red cross
           message.react("❌");
           const response = await message.reply("You can't go twice in a row!");
@@ -89,9 +103,12 @@ class Game {
         if (lastLetter.toLowerCase() === message.content[0].toLowerCase()) {
           // react a green checkmark
           message.react("✅");
-          if (message.author.id in points) { points[parseInt(message.author.id)]++ }
-          else { points[parseInt(message.author.id)] = 1 };
-          fs.writeFileSync("./data/points.json", JSON.stringify(points))
+          if (message.author.id in global.points) { global.points[message.author.id]++; console.log("Point Added"); }
+          else { global.points[message.author.id] = 1; console.log("Point Added") };
+          console.log(global.points);
+          console.log(typeof global.points)
+          console.log(JSON.stringify(global.points));
+          fs.writeFileSync("./src/data/points.json", JSON.stringify(global.points));
           client.user!.setActivity(
             `for the letter ${message.content[message.content.length - 1]}`,
             { type: ActivityType.Watching }
@@ -115,16 +132,6 @@ class Game {
   }
 }
 const pointEmbed = new EmbedBuilder();
-const setPointEmbed = (client: Client, type: string) => {
-  if (type == "current") {
-    pointEmbed.setTitle("Current scores")
-  } else if (type == "final") {
-    pointEmbed.setTitle("Final scores")
-  };
-  for (var key in global.points) {
-    pointEmbed.addFields({ name: (client.users.fetch(key)).toString(), value: global.points[key] });
-  };
-}
 const deleteMessageAfter = (message: Message<boolean>, seconds: number) => {
   setTimeout(() => {
     message.delete();
