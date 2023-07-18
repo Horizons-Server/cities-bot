@@ -1,5 +1,5 @@
 export interface global {};
 
 declare global {
-    var points: Record<int, int>; 
+    var points: Record<string, int>; 
 }
