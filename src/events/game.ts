@@ -63,16 +63,15 @@ class Game {
       // check if the message has been reacted to by the bot with a green checkmark
 
       if (msg.author.id === client.user!.id) continue;
-      if (msg.content === "VIEW CURRENT POINTS") continue;
-      if (msg.content === "START NEW GAME") continue;
+      if (msg.content.toLowerCase() === "VIEW CURRENT POINTS".toLowerCase()) continue;
+      if (msg.content.toLowerCase() === "START NEW GAME".toLowerCase()) continue;
+      if (msg.content.toLowerCase() === "VIEW CURRENT SCORES".toLowerCase()) continue;
       const reactions = await msg.reactions.resolve("✅")?.fetch();
-
       if (!reactions) continue;
       const users = await reactions.users.fetch();
 
       if (users.has(client.user!.id)) {
         if (msg.author.id === message.author.id) {
-                      
           // react a red cross
           message.react("❌");
           const response = await message.reply("You can't go twice in a row!");
