@@ -20,7 +20,7 @@ class Game {
       setPointEmbed(message, client, "final");
       return;
     }
-    else if (message.content === "VIEW CURRENT POINTS") {
+    else if (message.content === "VIEW CURRENT POINTS" || message.content === "VIEW CURRENT SCORES") {
       message.react("✅")
       setPointEmbed(message, client, "current");
       return;
@@ -45,7 +45,6 @@ class Game {
       if (msg.author.id === client.user!.id) continue;
       if (msg.content.toLowerCase() === message.content.toLowerCase()) {
         const reactions = await msg.reactions.resolve("✅")?.fetch();
-
         if (!reactions) continue;
 
         const users = await reactions.users.fetch();
@@ -64,7 +63,8 @@ class Game {
       // check if the message has been reacted to by the bot with a green checkmark
 
       if (msg.author.id === client.user!.id) continue;
-
+      if (msg.content === "VIEW CURRENT POINTS") continue;
+      if (msg.content === "START NEW GAME") continue;
       const reactions = await msg.reactions.resolve("✅")?.fetch();
 
       if (!reactions) continue;
@@ -79,7 +79,6 @@ class Game {
           deleteMessageAfter(response, 5);
           return;
         }
-
         // get the last letter of the message
         const lastLetter = msg.content[msg.content.length - 1];
 
