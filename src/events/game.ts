@@ -17,24 +17,12 @@ class Game {
 
     if (message.content === "START NEW GAME") {
       message.react("✅");
-      pointEmbed.setTitle("Final scores");
-      pointEmbed.setFields([]);
-      for (var key in global.points) {
-        pointEmbed.addFields({ name: (await client.users.fetch(key)).username.toString(), value: points[key].toString() });
-      };
-      message.channel.send({ embeds: [pointEmbed] });
-      global.points = {}
-      fs.writeFileSync("./src/data/points.json", JSON.stringify(global.points));
+      setPointEmbed(message, client, "final");
       return;
     }
-    if (message.content === "VIEW CURRENT POINTS") {
+    if (message.content === "VIEW CURRENT POINTS" || "VIEW CURRENT SCORES") {
       message.react("✅")
-      pointEmbed.setTitle("Current scores")
-      pointEmbed.setFields([]);
-      for (var key in global.points) {
-        pointEmbed.addFields({ name: (await client.users.fetch(key)).username.toString(), value: points[key].toString() });
-      };
-      message.reply({ embeds: [pointEmbed] });
+      setPointEmbed(message, client, "current");
       return;
     }
 
@@ -132,4 +120,34 @@ const deleteMessageAfter = (message: Message<boolean>, seconds: number) => {
   setTimeout(() => {
     message.delete();
   }, seconds * 1000);
+};
+async function setPointEmbed(message: Message<boolean>, client: Client, type: string) {
+  const embedsRequired = Math.ceil(Object.keys(global.points).length / 25);
+  console.log(embedsRequired);
+  if (embedsRequired === 0) {
+    message.channel.send("No points have been scored yet!");
+    return;
+  }
+  var tempPointEmbed = [];
+  for (var key in global.points) {
+    tempPointEmbed.push({ name: (await client.users.fetch(key)).username.toString(), value: points[key].toString() })
+  };
+  for (var i = 0; i < embedsRequired; i++) {
+    if (i === 0) { 
+      if (type === "final") { pointEmbed.setTitle("Final scores") }
+      else if (type === "current") { pointEmbed.setTitle("Current scores") }
+      else { throw Error("Invalid type of pointsDisplay entered") }
+    }
+    else { pointEmbed.setTitle(null)}
+    pointEmbed.setFields([]);
+    for (var j = 0; j < 25; j++) {
+      if (tempPointEmbed[j + (i * 25)] === undefined) { break; }
+      pointEmbed.addFields(tempPointEmbed[j + (i * 25)]);
+    };
+    await message.channel.send({ embeds: [pointEmbed] });
+  } 
+  if (type === "final") {
+    global.points = {};
+    fs.writeFileSync("./src/data/points.json", JSON.stringify(global.points));
+  }
 };
