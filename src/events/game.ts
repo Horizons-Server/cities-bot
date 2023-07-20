@@ -20,7 +20,7 @@ class Game {
       setPointEmbed(message, client, "final");
       return;
     }
-    if (message.content === "VIEW CURRENT POINTS" || "VIEW CURRENT SCORES") {
+    else if (message.content === "VIEW CURRENT POINTS") {
       message.react("✅")
       setPointEmbed(message, client, "current");
       return;
@@ -68,9 +68,6 @@ class Game {
       const reactions = await msg.reactions.resolve("✅")?.fetch();
 
       if (!reactions) continue;
-      if ((msg.content === "START NEW GAME") || (msg.content === "VIEW CURRENT POINTS")) {
-        continue;
-      }  
       const users = await reactions.users.fetch();
 
       if (users.has(client.user!.id)) {
