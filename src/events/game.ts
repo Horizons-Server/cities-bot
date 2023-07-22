@@ -19,9 +19,11 @@ class Game {
       message.react("✅");
       setPointEmbed(message, client, "final");
       return;
-    }
-    else if (message.content === "VIEW CURRENT POINTS" || message.content === "VIEW CURRENT SCORES") {
-      message.react("✅")
+    } else if (
+      message.content === "VIEW CURRENT POINTS" ||
+      message.content === "VIEW CURRENT SCORES"
+    ) {
+      message.react("✅");
       setPointEmbed(message, client, "current");
       return;
     }
@@ -63,11 +65,20 @@ class Game {
       // check if the message has been reacted to by the bot with a green checkmark
 
       if (msg.author.id === client.user!.id) continue;
-      if (msg.content.toLowerCase() === "VIEW CURRENT POINTS".toLowerCase()) continue;
-      if (msg.content.toLowerCase() === "START NEW GAME".toLowerCase()) continue;
-      if (msg.content.toLowerCase() === "VIEW CURRENT SCORES".toLowerCase()) continue;
+
+      if (
+        [
+          "VIEW CURRENT POINTS",
+          "START NEW GAME",
+          "VIEW CURRENT SCORES",
+        ].includes(msg.content.toUpperCase())
+      )
+        continue;
+
       const reactions = await msg.reactions.resolve("✅")?.fetch();
+
       if (!reactions) continue;
+
       const users = await reactions.users.fetch();
 
       if (users.has(client.user!.id)) {
@@ -85,9 +96,15 @@ class Game {
         if (lastLetter.toLowerCase() === message.content[0].toLowerCase()) {
           // react a green checkmark
           message.react("✅");
-          if (message.author.id in global.points) { global.points[message.author.id]++; }
-          else { global.points[message.author.id] = 1; };
-          fs.writeFileSync("./src/data/points.json", JSON.stringify(global.points));
+          if (message.author.id in global.points) {
+            global.points[message.author.id]++;
+          } else {
+            global.points[message.author.id] = 1;
+          }
+          fs.writeFileSync(
+            "./src/data/points.json",
+            JSON.stringify(global.points)
+          );
           client.user!.setActivity(
             `for the letter ${message.content[message.content.length - 1]}`,
             { type: ActivityType.Watching }
@@ -110,39 +127,66 @@ class Game {
     message.reply("Obi goofed up.");
   }
 }
-const pointEmbed = new EmbedBuilder();
+
 const deleteMessageAfter = (message: Message<boolean>, seconds: number) => {
   setTimeout(() => {
     message.delete();
   }, seconds * 1000);
 };
-async function setPointEmbed(message: Message<boolean>, client: Client, type: string) {
+
+async function setPointEmbed(
+  message: Message<boolean>,
+  client: Client,
+  type: "final" | "current"
+) {
   const embedsRequired = Math.ceil(Object.keys(global.points).length / 25);
-  console.log(embedsRequired);
+
   if (embedsRequired === 0) {
     message.channel.send("No points have been scored yet!");
     return;
   }
-  var tempPointEmbed = [];
-  for (var key in global.points) {
-    tempPointEmbed.push({ name: (await client.users.fetch(key)).username.toString(), value: points[key].toString() })
-  };
-  for (var i = 0; i < embedsRequired; i++) {
-    if (i === 0) { 
-      if (type === "final") { pointEmbed.setTitle("Final scores") }
-      else if (type === "current") { pointEmbed.setTitle("Current scores") }
-      else { throw Error("Invalid type of pointsDisplay entered") }
+
+  const tempPointEmbed = [];
+
+  for (const key in global.points) {
+    tempPointEmbed.push({
+      name: (await client.users.fetch(key)).username.toString(),
+      value: points[key].toString(),
+    });
+  }
+
+  // sort tempPointEmbed by value, descending
+  tempPointEmbed.sort((a, b) => {
+    return parseInt(b.value) - parseInt(a.value);
+  });
+
+  for (let i = 0; i < embedsRequired; i++) {
+    const pointEmbed = new EmbedBuilder();
+
+    if (i === 0) {
+      if (type === "final") {
+        pointEmbed.setTitle("Final scores");
+      } else if (type === "current") {
+        pointEmbed.setTitle("Current scores");
+      }
+    } else {
+      pointEmbed.setTitle(null);
     }
-    else { pointEmbed.setTitle(null)}
+
     pointEmbed.setFields([]);
-    for (var j = 0; j < 25; j++) {
-      if (tempPointEmbed[j + (i * 25)] === undefined) { break; }
-      pointEmbed.addFields(tempPointEmbed[j + (i * 25)]);
-    };
+
+    for (let j = 0; j < 25; j++) {
+      if (tempPointEmbed[j + i * 25] === undefined) {
+        break;
+      }
+      pointEmbed.addFields(tempPointEmbed[j + i * 25]);
+    }
+
     await message.channel.send({ embeds: [pointEmbed] });
-  } 
+  }
+
   if (type === "final") {
     global.points = {};
     fs.writeFileSync("./src/data/points.json", JSON.stringify(global.points));
   }
-};
+}
