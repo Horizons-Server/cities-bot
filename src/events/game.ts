@@ -16,18 +16,21 @@ class Game {
     if (message.author.bot) return;
 
     if (message.content === "START NEW GAME") {
-      if (message.member?.roles.cache.find(r => r.name === "Developer") || message.member?.permissions.has("ManageGuild")) {
+      if (
+        message.member?.roles.cache.find((r) => r.name === "Developer") ||
+        message.member?.permissions.has("ManageGuild")
+      ) {
         message.react("✅");
         setPointEmbed(message, client, "final");
         return;
-      }
-      else {
+      } else {
         message.react("❌");
-        const response = await message.reply("You don't have permission to do that!");
+        const response = await message.reply(
+          "You don't have permission to do that!"
+        );
         deleteMessageAfter(response, 5);
         return;
       }
-      
     } else if (
       message.content === "VIEW CURRENT POINTS" ||
       message.content === "VIEW CURRENT SCORES"
@@ -192,7 +195,6 @@ async function setPointEmbed(
     }
 
     const response = await message.channel.send({ embeds: [pointEmbed] });
-    deleteMessageAfter(response, 10);
   }
 
   if (type === "final") {
