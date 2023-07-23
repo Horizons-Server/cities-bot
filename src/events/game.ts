@@ -1,7 +1,7 @@
 import { ArgsOf, On, Client, Discord } from "discordx";
 import { env } from "../utils/env.js";
 import { isRealCity } from "../utils/cityChecker.js";
-import { ActivityType, EmbedBuilder, Message } from "discord.js";
+import { ActivityType, EmbedBuilder, Message, User } from "discord.js";
 import * as fs from "fs";
 
 @Discord()
@@ -16,9 +16,18 @@ class Game {
     if (message.author.bot) return;
 
     if (message.content === "START NEW GAME") {
-      message.react("✅");
-      setPointEmbed(message, client, "final");
-      return;
+      if (message.member?.roles.cache.find(r => r.name === "Developer") || message.member?.permissions.has("ManageGuild")) {
+        message.react("✅");
+        setPointEmbed(message, client, "final");
+        return;
+      }
+      else {
+        message.react("❌");
+        const response = await message.reply("You don't have permission to do that!");
+        deleteMessageAfter(response, 5);
+        return;
+      }
+      
     } else if (
       message.content === "VIEW CURRENT POINTS" ||
       message.content === "VIEW CURRENT SCORES"
@@ -182,7 +191,8 @@ async function setPointEmbed(
       pointEmbed.addFields(tempPointEmbed[j + i * 25]);
     }
 
-    await message.channel.send({ embeds: [pointEmbed] });
+    const response = await message.channel.send({ embeds: [pointEmbed] });
+    deleteMessageAfter(response, 10);
   }
 
   if (type === "final") {
