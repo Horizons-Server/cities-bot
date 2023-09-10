@@ -22,6 +22,11 @@ class Game {
       ) {
         message.react("✅");
         setPointEmbed(message, client, "final");
+        global.lastLetter = "";
+        client.user!.setActivity(
+          `for any letter`,
+          { type: ActivityType.Watching }
+        );
         return;
       } else {
         message.react("❌");
@@ -32,8 +37,8 @@ class Game {
         return;
       }
     } else if (
-      message.content === "VIEW CURRENT POINTS" ||
-      message.content === "VIEW CURRENT SCORES"
+      message.content.toUpperCase() === "VIEW CURRENT POINTS" ||
+      message.content.toUpperCase() === "VIEW CURRENT SCORES"
     ) {
       message.react("✅");
       setPointEmbed(message, client, "current");
@@ -43,12 +48,12 @@ class Game {
     // remove all accents and uppercase letters
     // const messageContent = message.content.normalize("NFD").toLowerCase();
 
-    if (!isRealCity(message.content)) {
-      message.react("❌");
-      const response = await message.reply("That's not a real city!");
-      deleteMessageAfter(response, 5);
-      return;
-    }
+    // if (!isRealCity(message.content)) {
+    //   message.react("❌");
+    //   const response = await message.reply("That's not a real city!");
+    //   deleteMessageAfter(response, 5);
+    //   return;
+    // }
 
     // get the most recent message from the channel
     const channel = await message.channel.fetch();
@@ -94,7 +99,7 @@ class Game {
       const users = await reactions.users.fetch();
 
       if (users.has(client.user!.id)) {
-        if (msg.author.id === message.author.id) {
+        if (msg.author.id === message.author.id && msg.content !== "START NEW GAME") {
           // react a red cross
           message.react("❌");
           const response = await message.reply("You can't go twice in a row!");
@@ -102,12 +107,14 @@ class Game {
           return;
         }
         // get the last letter of the message
-        const lastLetter = msg.content[msg.content.length - 1];
 
         // check if the last letter is the same as the first letter of the message
-        if (lastLetter.toLowerCase() === message.content[0].toLowerCase()) {
+        console.log(global.lastLetter);
+        console.log(message.content[0])
+        if (global.lastLetter === "") {
           // react a green checkmark
           message.react("✅");
+          global.lastLetter = message.content[message.content.length - 1].toLowerCase();
           if (message.author.id in global.points) {
             global.points[message.author.id]++;
           } else {
@@ -118,7 +125,24 @@ class Game {
             JSON.stringify(global.points)
           );
           client.user!.setActivity(
-            `for the letter ${message.content[message.content.length - 1]}`,
+            `for the letter ${global.lastLetter}`,
+            { type: ActivityType.Watching }
+          );
+          return;
+        } else if (global.lastLetter.toLowerCase() === message.content[0].toLowerCase()) {
+          message.react("✅");
+          global.lastLetter = message.content[message.content.length - 1].toLowerCase();
+          if (message.author.id in global.points) {
+            global.points[message.author.id]++;
+          } else {
+            global.points[message.author.id] = 1;
+          }
+          fs.writeFileSync(
+            "./src/data/points.json",
+            JSON.stringify(global.points)
+          );
+          client.user!.setActivity(
+            `for the letter ${global.lastLetter}`,
             { type: ActivityType.Watching }
           );
           return;
