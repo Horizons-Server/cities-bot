@@ -4,7 +4,7 @@ import { ActivityType, IntentsBitField } from "discord.js";
 import { Client } from "discordx";
 import { env } from "./utils/env.js";
 import * as fs from "fs";
-import { InitialiseLastLetter } from "./utils/LastLetter.js";
+import { InitialiseLastLetter } from "./utils/lastLetter.js";
 export const bot = new Client({
   // To use only guild command
   // botGuilds: [(client) => client.guilds.cache.map((guild) => guild.id)],
