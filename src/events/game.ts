@@ -109,8 +109,6 @@ class Game {
         // get the last letter of the message
 
         // check if the last letter is the same as the first letter of the message
-        console.log(global.lastLetter);
-        console.log(message.content[0])
         if (global.lastLetter === "") {
           // react a green checkmark
           message.react("✅");
